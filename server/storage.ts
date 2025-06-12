@@ -1,165 +1,138 @@
-import { 
-  users, cvs, interviewSessions, chatSessions,
-  type User, type InsertUser,
-  type CV, type InsertCV,
-  type InterviewSession, type InsertInterviewSession,
-  type ChatSession, type InsertChatSession
+import {
+  users,
+  cvs,
+  interviewSessions,
+  chatSessions,
+  type User,
+  type InsertUser,
+  type UpsertUser,
+  type CV,
+  type InsertCV,
+  type InterviewSession,
+  type InsertInterviewSession,
+  type ChatSession,
+  type InsertChatSession,
 } from "@shared/schema";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
 
 export interface IStorage {
-  // User operations
-  getUser(id: number): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  getUserByEmail(email: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
+  // User operations for Google Auth
+  getUser(id: string): Promise<User | undefined>;
+  upsertUser(user: UpsertUser): Promise<User>;
 
   // CV operations
   createCV(cv: InsertCV): Promise<CV>;
-  getUserCVs(userId: number): Promise<CV[]>;
+  getUserCVs(userId: string): Promise<CV[]>;
   updateCVHtml(id: number, html: string): Promise<CV | undefined>;
 
   // Interview operations
   createInterviewSession(session: InsertInterviewSession): Promise<InterviewSession>;
   getInterviewSession(id: number): Promise<InterviewSession | undefined>;
   updateInterviewSession(id: number, updates: Partial<InterviewSession>): Promise<InterviewSession | undefined>;
-  getUserInterviewSessions(userId: number): Promise<InterviewSession[]>;
+  getUserInterviewSessions(userId: string): Promise<InterviewSession[]>;
 
   // Chat operations
   createChatSession(session: InsertChatSession): Promise<ChatSession>;
   getChatSession(id: number): Promise<ChatSession | undefined>;
   updateChatMessages(id: number, messages: ChatSession['messages']): Promise<ChatSession | undefined>;
-  getUserChatSessions(userId: number): Promise<ChatSession[]>;
+  getUserChatSessions(userId: string): Promise<ChatSession[]>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User> = new Map();
-  private cvs: Map<number, CV> = new Map();
-  private interviewSessions: Map<number, InterviewSession> = new Map();
-  private chatSessions: Map<number, ChatSession> = new Map();
-  private currentId = 1;
-
-  // User operations
-  async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+export class DatabaseStorage implements IStorage {
+  // User operations for Google Auth
+  async getUser(id: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(user => user.username === username);
-  }
-
-  async getUserByEmail(email: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(user => user.email === email);
-  }
-
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentId++;
-    const user: User = { 
-      ...insertUser, 
-      id, 
-      createdAt: new Date() 
-    };
-    this.users.set(id, user);
+  async upsertUser(userData: UpsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(userData)
+      .onConflictDoUpdate({
+        target: users.id,
+        set: {
+          ...userData,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
     return user;
   }
 
-  // CV operations
   async createCV(insertCV: InsertCV): Promise<CV> {
-    const id = this.currentId++;
-    const cv: CV = {
-      ...insertCV,
-      id,
-      userId: insertCV.userId || null,
-      phone: insertCV.phone || null,
-      location: insertCV.location || null,
-      summary: insertCV.summary || null,
-      skills: insertCV.skills || null,
-      experience: insertCV.experience || null,
-      education: insertCV.education || null,
-      generatedHtml: null,
-      createdAt: new Date()
-    };
-    this.cvs.set(id, cv);
+    const [cv] = await db
+      .insert(cvs)
+      .values(insertCV)
+      .returning();
     return cv;
   }
 
-  async getUserCVs(userId: number): Promise<CV[]> {
-    return Array.from(this.cvs.values()).filter(cv => cv.userId === userId);
+  async getUserCVs(userId: string): Promise<CV[]> {
+    return await db.select().from(cvs).where(eq(cvs.userId, userId));
   }
 
   async updateCVHtml(id: number, html: string): Promise<CV | undefined> {
-    const cv = this.cvs.get(id);
-    if (cv) {
-      const updated = { ...cv, generatedHtml: html };
-      this.cvs.set(id, updated);
-      return updated;
-    }
-    return undefined;
+    const [cv] = await db
+      .update(cvs)
+      .set({ generatedHtml: html, updatedAt: new Date() })
+      .where(eq(cvs.id, id))
+      .returning();
+    return cv || undefined;
   }
 
-  // Interview operations
   async createInterviewSession(insertSession: InsertInterviewSession): Promise<InterviewSession> {
-    const id = this.currentId++;
-    const session: InterviewSession = {
-      ...insertSession,
-      id,
-      questions: insertSession.questions || [],
-      overallScore: null,
-      completed: false,
-      createdAt: new Date()
-    };
-    this.interviewSessions.set(id, session);
+    const [session] = await db
+      .insert(interviewSessions)
+      .values(insertSession)
+      .returning();
     return session;
   }
 
   async getInterviewSession(id: number): Promise<InterviewSession | undefined> {
-    return this.interviewSessions.get(id);
+    const [session] = await db.select().from(interviewSessions).where(eq(interviewSessions.id, id));
+    return session || undefined;
   }
 
   async updateInterviewSession(id: number, updates: Partial<InterviewSession>): Promise<InterviewSession | undefined> {
-    const session = this.interviewSessions.get(id);
-    if (session) {
-      const updated = { ...session, ...updates };
-      this.interviewSessions.set(id, updated);
-      return updated;
-    }
-    return undefined;
+    const [session] = await db
+      .update(interviewSessions)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(interviewSessions.id, id))
+      .returning();
+    return session || undefined;
   }
 
-  async getUserInterviewSessions(userId: number): Promise<InterviewSession[]> {
-    return Array.from(this.interviewSessions.values()).filter(session => session.userId === userId);
+  async getUserInterviewSessions(userId: string): Promise<InterviewSession[]> {
+    return await db.select().from(interviewSessions).where(eq(interviewSessions.userId, userId));
   }
 
-  // Chat operations
   async createChatSession(insertSession: InsertChatSession): Promise<ChatSession> {
-    const id = this.currentId++;
-    const session: ChatSession = {
-      ...insertSession,
-      id,
-      messages: insertSession.messages || [],
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-    this.chatSessions.set(id, session);
+    const [session] = await db
+      .insert(chatSessions)
+      .values(insertSession)
+      .returning();
     return session;
   }
 
   async getChatSession(id: number): Promise<ChatSession | undefined> {
-    return this.chatSessions.get(id);
+    const [session] = await db.select().from(chatSessions).where(eq(chatSessions.id, id));
+    return session || undefined;
   }
 
   async updateChatMessages(id: number, messages: ChatSession['messages']): Promise<ChatSession | undefined> {
-    const session = this.chatSessions.get(id);
-    if (session) {
-      const updated = { ...session, messages, updatedAt: new Date() };
-      this.chatSessions.set(id, updated);
-      return updated;
-    }
-    return undefined;
+    const [session] = await db
+      .update(chatSessions)
+      .set({ messages, updatedAt: new Date() })
+      .where(eq(chatSessions.id, id))
+      .returning();
+    return session || undefined;
   }
 
-  async getUserChatSessions(userId: number): Promise<ChatSession[]> {
-    return Array.from(this.chatSessions.values()).filter(session => session.userId === userId);
+  async getUserChatSessions(userId: string): Promise<ChatSession[]> {
+    return await db.select().from(chatSessions).where(eq(chatSessions.userId, userId));
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
