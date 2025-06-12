@@ -133,161 +133,291 @@ export default function CVBuilder() {
   };
 
   return (
-    <div className="min-h-screen bg-dark text-slate-50">
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
       <Header />
       
-      <section className="py-20 bg-slate-900/50">
+      <section className="py-12 lg:py-20 bg-muted/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 text-white">AI-Powered CV Builder</h2>
-            <p className="text-xl text-slate-400 max-w-3xl mx-auto">
+          <div className="text-center mb-16 animate-fade-in">
+            <div className="flex justify-center mb-4">
+              <div className="bg-gradient-to-r from-primary to-blue-600 p-3 rounded-2xl">
+                <Sparkles className="w-8 h-8 text-white" />
+              </div>
+            </div>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 text-foreground">
+              AI-Powered CV Builder
+            </h2>
+            <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
               Create a professional resume in minutes. Our AI analyzes your information and formats it according to industry standards.
             </p>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-12 items-start">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-start">
             {/* CV Builder Form */}
-            <Card className="bg-surface/70 backdrop-blur-sm border-slate-700">
-              <CardHeader>
-                <CardTitle className="text-2xl font-semibold text-white flex items-center">
-                  <UserCircle className="text-primary mr-3" />
+            <Card className="bg-card/50 backdrop-blur-sm border-border/50 shadow-xl animate-slide-up">
+              <CardHeader className="pb-6">
+                <CardTitle className="text-2xl lg:text-3xl font-semibold text-foreground flex items-center">
+                  <UserCircle className="text-primary mr-3 w-8 h-8" />
                   Your Information
                 </CardTitle>
+                <p className="text-muted-foreground text-sm">
+                  Fill in your details below. Required fields are marked with an asterisk.
+                </p>
               </CardHeader>
               <CardContent>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div>
-                      <Label htmlFor="fullName" className="text-slate-300">Full Name</Label>
-                      <Input
-                        id="fullName"
-                        placeholder="John Doe"
-                        {...form.register("fullName")}
-                        className="bg-slate-800 border-slate-600 text-white placeholder-slate-400 focus:ring-primary focus:border-primary"
+                  {/* Personal Information */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-medium text-foreground border-b border-border pb-2">
+                      Personal Details
+                    </h3>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="fullName" className="text-foreground font-medium">
+                          Full Name <span className="text-destructive">*</span>
+                        </Label>
+                        <Input
+                          id="fullName"
+                          placeholder="John Doe"
+                          {...form.register("fullName")}
+                          className={`transition-all duration-200 ${
+                            form.formState.errors.fullName 
+                              ? 'border-destructive focus:ring-destructive' 
+                              : 'focus:ring-primary focus:border-primary'
+                          }`}
+                        />
+                        {form.formState.errors.fullName && (
+                          <div className="flex items-center text-destructive text-sm mt-1">
+                            <AlertCircle className="w-4 h-4 mr-1" />
+                            {form.formState.errors.fullName.message}
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="email" className="text-foreground font-medium">
+                          Email Address <span className="text-destructive">*</span>
+                        </Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          placeholder="john@example.com"
+                          {...form.register("email")}
+                          className={`transition-all duration-200 ${
+                            form.formState.errors.email 
+                              ? 'border-destructive focus:ring-destructive' 
+                              : 'focus:ring-primary focus:border-primary'
+                          }`}
+                        />
+                        {form.formState.errors.email && (
+                          <div className="flex items-center text-destructive text-sm mt-1">
+                            <AlertCircle className="w-4 h-4 mr-1" />
+                            {form.formState.errors.email.message}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="phone" className="text-foreground font-medium">Phone Number</Label>
+                        <Input
+                          id="phone"
+                          type="tel"
+                          placeholder="+94 77 123 4567"
+                          {...form.register("phone")}
+                          className="focus:ring-primary focus:border-primary transition-all duration-200"
+                        />
+                        {form.formState.errors.phone && (
+                          <div className="flex items-center text-destructive text-sm mt-1">
+                            <AlertCircle className="w-4 h-4 mr-1" />
+                            {form.formState.errors.phone.message}
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="location" className="text-foreground font-medium">Location</Label>
+                        <Input
+                          id="location"
+                          placeholder="Colombo, Sri Lanka"
+                          {...form.register("location")}
+                          className="focus:ring-primary focus:border-primary transition-all duration-200"
+                        />
+                        {form.formState.errors.location && (
+                          <div className="flex items-center text-destructive text-sm mt-1">
+                            <AlertCircle className="w-4 h-4 mr-1" />
+                            {form.formState.errors.location.message}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Professional Information */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-medium text-foreground border-b border-border pb-2">
+                      Professional Information
+                    </h3>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="summary" className="text-foreground font-medium">
+                        Professional Summary
+                      </Label>
+                      <Textarea
+                        id="summary"
+                        rows={4}
+                        placeholder="A brief summary of your experience, skills, and career goals. Keep it between 50-500 characters for best results."
+                        {...form.register("summary")}
+                        className="resize-none focus:ring-primary focus:border-primary transition-all duration-200"
                       />
-                      {form.formState.errors.fullName && (
-                        <p className="text-red-400 text-sm mt-1">{form.formState.errors.fullName.message}</p>
+                      <div className="flex justify-between items-center">
+                        {form.formState.errors.summary ? (
+                          <div className="flex items-center text-destructive text-sm">
+                            <AlertCircle className="w-4 h-4 mr-1" />
+                            {form.formState.errors.summary.message}
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground text-sm">
+                            {form.watch("summary")?.length || 0} characters
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="skills" className="text-foreground font-medium">
+                        Skills <span className="text-destructive">*</span>
+                      </Label>
+                      <Input
+                        id="skills"
+                        placeholder="JavaScript, React, Node.js, Python, Communication, Leadership..."
+                        {...form.register("skills")}
+                        className={`transition-all duration-200 ${
+                          form.formState.errors.skills 
+                            ? 'border-destructive focus:ring-destructive' 
+                            : 'focus:ring-primary focus:border-primary'
+                        }`}
+                      />
+                      {form.formState.errors.skills ? (
+                        <div className="flex items-center text-destructive text-sm mt-1">
+                          <AlertCircle className="w-4 h-4 mr-1" />
+                          {form.formState.errors.skills.message}
+                        </div>
+                      ) : (
+                        <p className="text-muted-foreground text-sm">
+                          Separate skills with commas. Include both technical and soft skills.
+                        </p>
                       )}
                     </div>
-                    <div>
-                      <Label htmlFor="email" className="text-slate-300">Email</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="john@example.com"
-                        {...form.register("email")}
-                        className="bg-slate-800 border-slate-600 text-white placeholder-slate-400 focus:ring-primary focus:border-primary"
+
+                    <div className="space-y-2">
+                      <Label htmlFor="experience" className="text-foreground font-medium">
+                        Work Experience <span className="text-destructive">*</span>
+                      </Label>
+                      <Textarea
+                        id="experience"
+                        rows={5}
+                        placeholder="Describe your work experience, internships, projects, or relevant activities. Include company names, positions, dates, and key achievements."
+                        {...form.register("experience")}
+                        className={`resize-none transition-all duration-200 ${
+                          form.formState.errors.experience 
+                            ? 'border-destructive focus:ring-destructive' 
+                            : 'focus:ring-primary focus:border-primary'
+                        }`}
                       />
-                      {form.formState.errors.email && (
-                        <p className="text-red-400 text-sm mt-1">{form.formState.errors.email.message}</p>
+                      {form.formState.errors.experience && (
+                        <div className="flex items-center text-destructive text-sm mt-1">
+                          <AlertCircle className="w-4 h-4 mr-1" />
+                          {form.formState.errors.experience.message}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="education" className="text-foreground font-medium">
+                        Education <span className="text-destructive">*</span>
+                      </Label>
+                      <Textarea
+                        id="education"
+                        rows={3}
+                        placeholder="Your educational background including degrees, certifications, courses, and relevant academic achievements."
+                        {...form.register("education")}
+                        className={`resize-none transition-all duration-200 ${
+                          form.formState.errors.education 
+                            ? 'border-destructive focus:ring-destructive' 
+                            : 'focus:ring-primary focus:border-primary'
+                        }`}
+                      />
+                      {form.formState.errors.education && (
+                        <div className="flex items-center text-destructive text-sm mt-1">
+                          <AlertCircle className="w-4 h-4 mr-1" />
+                          {form.formState.errors.education.message}
+                        </div>
                       )}
                     </div>
                   </div>
 
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div>
-                      <Label htmlFor="phone" className="text-slate-300">Phone</Label>
-                      <Input
-                        id="phone"
-                        type="tel"
-                        placeholder="+94 77 123 4567"
-                        {...form.register("phone")}
-                        className="bg-slate-800 border-slate-600 text-white placeholder-slate-400 focus:ring-primary focus:border-primary"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="location" className="text-slate-300">Location</Label>
-                      <Input
-                        id="location"
-                        placeholder="Colombo, Sri Lanka"
-                        {...form.register("location")}
-                        className="bg-slate-800 border-slate-600 text-white placeholder-slate-400 focus:ring-primary focus:border-primary"
-                      />
-                    </div>
+                  {/* Submit Button */}
+                  <div className="pt-4">
+                    <Button
+                      type="submit"
+                      disabled={generateCVMutation.isPending}
+                      className="w-full bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                    >
+                      {generateCVMutation.isPending ? (
+                        <div className="flex items-center justify-center">
+                          <LoadingSpinner size="sm" className="mr-2" />
+                          Generating Your Professional CV...
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-center">
+                          <Wand2 className="mr-2 h-5 w-5" />
+                          Generate My CV with AI
+                        </div>
+                      )}
+                    </Button>
                   </div>
-
-                  <div>
-                    <Label htmlFor="summary" className="text-slate-300">Professional Summary</Label>
-                    <Textarea
-                      id="summary"
-                      rows={4}
-                      placeholder="Brief summary of your experience and goals..."
-                      {...form.register("summary")}
-                      className="bg-slate-800 border-slate-600 text-white placeholder-slate-400 focus:ring-primary focus:border-primary resize-none"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="skills" className="text-slate-300">Skills (comma-separated)</Label>
-                    <Input
-                      id="skills"
-                      placeholder="JavaScript, React, Node.js, Python..."
-                      {...form.register("skills")}
-                      className="bg-slate-800 border-slate-600 text-white placeholder-slate-400 focus:ring-primary focus:border-primary"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="experience" className="text-slate-300">Experience</Label>
-                    <Textarea
-                      id="experience"
-                      rows={4}
-                      placeholder="List your work experience, projects, or relevant activities..."
-                      {...form.register("experience")}
-                      className="bg-slate-800 border-slate-600 text-white placeholder-slate-400 focus:ring-primary focus:border-primary resize-none"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="education" className="text-slate-300">Education</Label>
-                    <Textarea
-                      id="education"
-                      rows={3}
-                      placeholder="Your educational background..."
-                      {...form.register("education")}
-                      className="bg-slate-800 border-slate-600 text-white placeholder-slate-400 focus:ring-primary focus:border-primary resize-none"
-                    />
-                  </div>
-
-                  <Button
-                    type="submit"
-                    disabled={generateCVMutation.isPending}
-                    className="w-full bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300"
-                  >
-                    {generateCVMutation.isPending ? (
-                      <>Generating...</>
-                    ) : (
-                      <>
-                        <Wand2 className="mr-2 h-5 w-5" />
-                        Generate My CV with AI
-                      </>
-                    )}
-                  </Button>
                 </form>
               </CardContent>
             </Card>
 
             {/* CV Preview */}
-            <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
+            <div className="bg-background border border-border rounded-2xl shadow-xl overflow-hidden animate-slide-up" style={{ animationDelay: '0.2s' }}>
               {generatedCV?.generatedHtml ? (
                 <div>
+                  <div className="bg-muted/50 p-4 border-b border-border">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center text-foreground">
+                        <CheckCircle2 className="w-5 h-5 text-green-500 mr-2" />
+                        <span className="font-medium">CV Generated Successfully</span>
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {new Date().toLocaleDateString()}
+                      </div>
+                    </div>
+                  </div>
+                  
                   <div 
-                    className="p-8"
+                    className="p-8 text-gray-900 max-h-[600px] overflow-y-auto"
                     dangerouslySetInnerHTML={{ __html: generatedCV.generatedHtml }}
                   />
+                  
                   <Separator />
-                  <div className="bg-slate-50 p-6">
-                    <div className="flex gap-4">
+                  
+                  <div className="bg-muted/30 p-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <Button 
                         onClick={exportToPDF}
-                        className="flex-1 bg-primary hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-xl transition-colors flex items-center justify-center"
+                        className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-3 px-6 rounded-xl transition-all duration-300 flex items-center justify-center transform hover:scale-105"
                       >
                         <Download className="mr-2 h-4 w-4" />
                         Export PDF
                       </Button>
                       <Button 
                         variant="outline"
-                        className="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-800 font-semibold py-3 px-6 rounded-xl transition-colors flex items-center justify-center"
+                        className="font-semibold py-3 px-6 rounded-xl transition-all duration-300 flex items-center justify-center hover:bg-accent"
                       >
                         <Edit className="mr-2 h-4 w-4" />
                         Edit Template
@@ -296,19 +426,22 @@ export default function CVBuilder() {
                   </div>
                 </div>
               ) : (
-                <div className="p-8 text-gray-800">
-                  <div className="bg-gradient-to-r from-slate-800 to-slate-900 p-8 text-white mb-8 rounded-lg">
-                    <h2 className="text-3xl font-bold mb-2">Your Name</h2>
-                    <p className="text-slate-300 text-lg mb-4">Your Job Title</p>
-                    <div className="flex flex-wrap gap-4 text-sm">
+                <div className="p-8">
+                  <div className="bg-gradient-to-r from-primary/10 to-blue-600/10 p-8 rounded-2xl mb-8 border border-border/50">
+                    <h2 className="text-3xl font-bold mb-2 text-foreground">Your Name</h2>
+                    <p className="text-muted-foreground text-lg mb-4">Your Professional Title</p>
+                    <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
                       <span>📧 your@email.com</span>
                       <span>📱 +94 77 123 4567</span>
                       <span>📍 Your Location</span>
                     </div>
                   </div>
                   
-                  <div className="text-center text-gray-500 py-12">
-                    <p className="text-lg mb-4">Your generated CV will appear here</p>
+                  <div className="text-center text-muted-foreground py-12">
+                    <div className="w-16 h-16 mx-auto mb-4 bg-muted rounded-full flex items-center justify-center">
+                      <Sparkles className="w-8 h-8 text-primary" />
+                    </div>
+                    <p className="text-lg mb-4 font-medium">Your AI-generated CV will appear here</p>
                     <p className="text-sm">Fill out the form and click "Generate My CV with AI" to get started</p>
                   </div>
                 </div>
