@@ -3,6 +3,7 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { ThemeProvider } from "@/components/ThemeProvider";
 import Home from "@/pages/Home";
 import CVBuilder from "@/pages/CVBuilder";
 import InterviewTrainer from "@/pages/InterviewTrainer";
@@ -23,14 +24,16 @@ function Router() {
 
 function App() {
   return (
-    <div className="dark min-h-screen bg-dark text-slate-50">
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <Router />
-        </TooltipProvider>
-      </QueryClientProvider>
-    </div>
+    <ThemeProvider defaultTheme="dark" storageKey="jobready-ui-theme">
+      <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <Toaster />
+            <Router />
+          </TooltipProvider>
+        </QueryClientProvider>
+      </div>
+    </ThemeProvider>
   );
 }
 

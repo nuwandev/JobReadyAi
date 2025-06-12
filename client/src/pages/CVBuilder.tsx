@@ -10,20 +10,48 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { UserCircle, Wand2, Download, Edit } from "lucide-react";
+import { UserCircle, Wand2, Download, Edit, AlertCircle, CheckCircle2, Sparkles } from "lucide-react";
 import type { CV } from "@shared/schema";
 
 const cvFormSchema = z.object({
-  fullName: z.string().min(1, "Full name is required"),
-  email: z.string().email("Valid email is required"),
-  phone: z.string().optional(),
-  location: z.string().optional(),
-  summary: z.string().optional(),
-  skills: z.string().optional(),
-  experience: z.string().optional(),
-  education: z.string().optional(),
+  fullName: z.string()
+    .min(2, "Full name must be at least 2 characters")
+    .max(50, "Full name must be less than 50 characters")
+    .regex(/^[a-zA-Z\s]+$/, "Full name should only contain letters and spaces"),
+  email: z.string()
+    .email("Please enter a valid email address")
+    .min(5, "Email is too short")
+    .max(100, "Email is too long"),
+  phone: z.string()
+    .optional()
+    .refine((val) => !val || /^[\+]?[0-9\s\-\(\)]{7,15}$/.test(val), {
+      message: "Please enter a valid phone number"
+    }),
+  location: z.string()
+    .optional()
+    .refine((val) => !val || val.length >= 2, {
+      message: "Location must be at least 2 characters"
+    }),
+  summary: z.string()
+    .optional()
+    .refine((val) => !val || (val.length >= 50 && val.length <= 500), {
+      message: "Summary should be between 50-500 characters for best results"
+    }),
+  skills: z.string()
+    .min(1, "Please add at least one skill")
+    .refine((val) => val.split(',').filter(s => s.trim()).length >= 3, {
+      message: "Please add at least 3 skills separated by commas"
+    }),
+  experience: z.string()
+    .min(20, "Please provide more details about your experience (at least 20 characters)")
+    .max(2000, "Experience description is too long"),
+  education: z.string()
+    .min(10, "Please provide your educational background (at least 10 characters)")
+    .max(1000, "Education description is too long"),
   userId: z.number().optional(),
 });
 
