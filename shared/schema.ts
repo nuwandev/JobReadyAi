@@ -94,6 +94,9 @@ export const insertCvSchema = createInsertSchema(cvs).omit({
   createdAt: true,
   updatedAt: true,
   generatedHtml: true,
+}).extend({
+  userId: z.string().default("dev-user-1"),
+  title: z.string().default("My CV")
 });
 
 export const insertInterviewSessionSchema = createInsertSchema(interviewSessions).omit({
@@ -102,12 +105,16 @@ export const insertInterviewSessionSchema = createInsertSchema(interviewSessions
   updatedAt: true,
   overallScore: true,
   completed: true,
+}).extend({
+  userId: z.string().default("dev-user-1")
 });
 
 export const insertChatSessionSchema = createInsertSchema(chatSessions).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+}).extend({
+  userId: z.string().default("dev-user-1")
 });
 
 // Types
